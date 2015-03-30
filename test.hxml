@@ -1,0 +1,19 @@
+hxml/ogg2Wav.hxml
+-main Ogg2WavTestSys
+-cs sample/bin/cs
+
+--next
+-cmd ""sample/bin/cs/bin/Ogg2WavTestSys.exe"" -
+
+#hxml/ogg2Wav.hxml
+#-main Ogg2WavTestSys
+#-java sample/bin/java
+#
+#--next
+#-cmd java -jar sample/bin/java/Ogg2WavTestSys.jar
+
+# --next
+# hxml/ogg2Wav.hxml
+# -main Ogg2WavTestFlash
+# -swf sample/bin/Ogg2Wav.swf
+# -debug
