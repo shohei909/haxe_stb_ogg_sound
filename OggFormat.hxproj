@@ -24,7 +24,7 @@
     <option directives="" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="Ogg2WavTestFlash" />
+    <option mainClass="VorbisSoundPlayer" />
     <option enabledebug="True" />
     <option additional="" />
   </build>
@@ -37,8 +37,8 @@
   <compileTargets>
     <compile path="src\Main.hx" />
     <compile path="sample\Main.hx" />
-    <compile path="sample\Ogg2WavSys.hx" />
     <compile path="sample\Ogg2WavTestFlash.hx" />
+    <compile path="sample\VorbisSoundPlayer.hx" />
   </compileTargets>
   <!-- Assets to embed into the output SWF -->
   <library>

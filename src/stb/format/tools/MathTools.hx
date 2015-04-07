@@ -1,11 +1,12 @@
 package stb.format.tools;
 
 /**
+ * ...
  * @author shohei909
  */
 class MathTools
 {
-	static public inline function ilog(n:Int)
+	public static inline function ilog(n:Int)
 	{
 		var log2_4 = [0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4];
 		

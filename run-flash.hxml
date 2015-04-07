@@ -1,0 +1,5 @@
+-cp sample
+-cp src
+-main Ogg2WavFlash
+-swf sample/bin/ogg2wav.swf
+-swf-version 17

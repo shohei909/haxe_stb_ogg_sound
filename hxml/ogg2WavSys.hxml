@@ -1,0 +1,3 @@
+-cp sample
+-cp src
+-main Ogg2WavSys

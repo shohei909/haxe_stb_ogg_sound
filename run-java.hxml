@@ -1,0 +1,5 @@
+hxml/ogg2WavSys.hxml
+-java sample/bin/java
+
+--next
+-cmd echo Java && java -jar sample/bin/java/Ogg2WavSys.jar
