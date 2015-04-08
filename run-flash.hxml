@@ -3,3 +3,12 @@
 -main Ogg2WavFlash
 -swf sample/bin/ogg2wav.swf
 -swf-version 17
+-swf-header 472:472:30:ffffff
+
+--next
+-cp sample
+-cp src
+-main VorbisSoundPlayer
+-swf sample/bin/VorbisSoundPlayer.swf
+-swf-version 17
+-swf-header 472:55:30:ffffff

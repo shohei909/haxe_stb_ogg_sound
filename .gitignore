@@ -1,3 +1,4 @@
 c/
 bin/
 sample/sound/wav/*.wav
+sample/sound/~*.ogg

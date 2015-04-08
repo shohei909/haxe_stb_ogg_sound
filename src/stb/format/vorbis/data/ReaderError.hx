@@ -7,15 +7,15 @@ import haxe.PosInfos;
  */
 class ReaderError
 {
-	public var type(default, null):ReaderErrorType;
-	public var message(default, null):String;
-	public var posInfos(default, null):PosInfos;
-	
-	public function new(type:ReaderErrorType, ?message:String = "", ?posInfos:PosInfos) {
-		this.type = type;
-		this.message = message;
-		this.posInfos = posInfos;
-	}
+    public var type(default, null):ReaderErrorType;
+    public var message(default, null):String;
+    public var posInfos(default, null):PosInfos;
+
+    public function new(type:ReaderErrorType, ?message:String = "", ?posInfos:PosInfos) {
+        this.type = type;
+        this.message = message;
+        this.posInfos = posInfos;
+    }
 }
 
 enum ReaderErrorType
@@ -48,6 +48,6 @@ enum ReaderErrorType
    BAD_PACKET_TYPE;
    CANT_FIND_LAST_PAGE;
    SEEK_FAILED;
-   
+
    OTHER;
 }

@@ -6,10 +6,10 @@ package stb.format.vorbis.data;
  */
 class IntPoint
 {
-	public var x:Int;
-	public var y:Int;
-	
-	public function new() {
-		
-	}
+    public var x:Int;
+    public var y:Int;
+
+    public function new() {
+
+    }
 }
