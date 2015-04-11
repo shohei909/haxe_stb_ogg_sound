@@ -37,7 +37,7 @@ class VorbisDecodeState
     public var input(default, null):Input;
     public var discardSamplesDeferred:Int;
     public var segments(default, null):Vector<Int>;
-    public var bytesInSeg:Int; // uint8
+    public var bytesInSeg:Int = 0; // uint8
 
     // decode buffer
     public var channelBuffers:Vector<Vector<Float>>; //var *[STB_VORBIS_MAX_CHANNELS];
