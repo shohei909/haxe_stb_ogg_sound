@@ -30,7 +30,7 @@ class Ogg2WavFlash extends Sprite
         stage.addEventListener(Event.ENTER_FRAME, onFrame);
 
         var background = new BitmapData(stage.stageWidth, stage.stageHeight);
-        background.noise(1, 250, 255, 7, true);
+        background.noise(1, 240, 255, 7, true);
         Lib.current.addChild(new Bitmap(background));
 
         textField = new TextField();

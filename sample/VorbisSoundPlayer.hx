@@ -90,11 +90,11 @@ private class PlayerSprite extends Sprite {
 
         //text
         addChild(textField = new TextField());
-        textField.defaultTextFormat = new TextFormat("_sans", 14, 0x8D8E8F, true, false, false, null, null, TextFormatAlign.CENTER);
+        textField.defaultTextFormat = new TextFormat("_sans", 12, 0x8D8E8F, true, false, false, null, null, TextFormatAlign.CENTER);
         textField.width = TEXT_W;
-        textField.height = 22;
+        textField.height = 19;
         textField.x = BUTTON_W + 1 + MARGIN + BAR_W + MARGIN;
-        textField.y = (H - 22) / 2;
+        textField.y = (H - 19) / 2;
 
         draw();
 
@@ -220,7 +220,7 @@ private class PlayerSprite extends Sprite {
     }
 
     function play() {
-        var channel = sound.play(position);
+        var channel = sound.play(position, 0x7FFFFFFF);
         channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
         state = PlayerState.Playing(channel);
         draw();

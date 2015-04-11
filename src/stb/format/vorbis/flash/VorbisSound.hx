@@ -17,9 +17,20 @@ class VorbisSound {
         length = rootReader.totalMillisecond;
     }
 
-    public function play(startTime:Float, loops:Int = 0, ?sndTransform:SoundTransform):VorbisSoundChannel {
+    public function play(startMillisecond:Float, loops:Int = 0, ?sndTransform:SoundTransform):VorbisSoundChannel {
         var sound = new Sound();
         var reader = rootReader.clone();
-        return VorbisSoundChannel.play(sound, reader, startTime, loops, startTime, sndTransform);
+        var startSample = reader.millisecondToSample(startMillisecond);
+        var loopStart = startSample;
+        var loopEnd = rootReader.totalSample;
+
+        if (rootReader.loopStart != null) {
+            loopStart = rootReader.loopStart;
+            if (rootReader.loopLength != null) {
+                loopEnd = rootReader.loopStart + rootReader.loopLength;
+            }
+        }
+
+        return VorbisSoundChannel.play(sound, reader, startSample, loops, loopStart, loopEnd, sndTransform);
     }
 }

@@ -12,12 +12,12 @@ class Comment {
         return getString("title");
     }
 
-    public var loopStart(get, never):Int;
+    public var loopStart(get, never):Null<Int>;
     function get_loopStart() {
         return Std.parseInt(getString("loopstart"));
     }
 
-    public var loopLength(get, never):Int;
+    public var loopLength(get, never):Null<Int>;
     function get_loopLength() {
         return Std.parseInt(getString("looplength"));
     }
@@ -113,18 +113,18 @@ class Comment {
     public function getString(key:String) {
         key = key.toLowerCase();
         return if (data.exists(key)) {
-            null;
-        } else {
             data[key][0];
+        } else {
+            null;
         }
     }
 
     public function getArray(key:String) {
         key = key.toLowerCase();
         return if (data.exists(key)) {
-            null;
-        } else {
             data[key];
+        } else {
+            null;
         }
     }
 }

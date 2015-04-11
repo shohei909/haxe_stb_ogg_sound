@@ -56,6 +56,7 @@ class Reader {
     }
 
     public var currentMillisecond(get, set):Float;
+
     function get_currentMillisecond():Float
     {
         return sampleToMillisecond(currentSample);
@@ -66,6 +67,9 @@ class Reader {
         return currentMillisecond;
     }
 
+    public var loopStart:Null<Int>;
+    public var loopLength:Null<Int>;
+
     var seekFunc:Int->Void;
     var inputLength:Int;
 
@@ -74,6 +78,8 @@ class Reader {
         this.inputLength = inputLength;
         decoder = VorbisDecoder.start(input);
         decoder.setupSampleNumber(seekFunc, inputLength);
+        loopStart = header.comment.loopStart;
+        loopLength = header.comment.loopLength;
     }
 
     public static function openFromBytes(bytes:Bytes) {
@@ -125,6 +131,8 @@ class Reader {
         reader.seekFunc = seekFunc;
         reader.inputLength = inputLength;
         reader.decoder = decoder.clone(seekFunc);
+        reader.loopStart = loopStart;
+        reader.loopLength = loopLength;
         return reader;
     }
 

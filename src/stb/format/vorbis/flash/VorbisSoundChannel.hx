@@ -39,10 +39,12 @@ class VorbisSoundChannel implements IEventDispatcher {
 
     var reader(default, null):Reader;
     var loopReader(default, null):Reader;
+    var loopEnd:Int;
 
-    function new (reader:Reader, startSample:Int, loop:Int, loopStartSample:Int) {
+    function new (reader:Reader, startSample:Int, loop:Int, loopStartSample:Int, loopEndSample:Int) {
         this.reader = reader;
         this.loop = loop;
+        this.loopEnd = loopEndSample;
 
         currentLoop = 0;
         reader.currentSample = startSample;
@@ -53,16 +55,17 @@ class VorbisSoundChannel implements IEventDispatcher {
         }
     }
 
-    static public function play(sound:Sound, reader:Reader, startTime:Float = 0, loop:Int = 0, looptartTime:Float = 0, ?soundTransform:SoundTransform) {
+    static public function play(sound:Sound, reader:Reader, startSample:Int, loop:Int, loopStartSample:Int, loopEndSample:Int, ?soundTransform:SoundTransform) {
         var vorbisChannel = new VorbisSoundChannel(
             reader,
-            reader.millisecondToSample(startTime),
+            startSample,
             loop,
-            reader.millisecondToSample(looptartTime)
+            loopStartSample,
+            loopEndSample
         );
 
         sound.addEventListener(SampleDataEvent.SAMPLE_DATA, vorbisChannel.onSampleData);
-        var channel = sound.play(startTime, loop, soundTransform);
+        var channel = sound.play(reader.sampleToMillisecond(startSample), loop, soundTransform);
         if (channel == null) {
             return null;
         } else {
@@ -80,21 +83,27 @@ class VorbisSoundChannel implements IEventDispatcher {
         untyped output.b = event.data;
 
         var n = 0;
-        if (loop <= 1 || loopReader.currentSample < reader.totalSample - 1) {
-            for (i in 0...8192) {
-                n += reader.read(output, 8192 - n, 2, 44100, true);
-                if (n < 8192) {
-                    if (currentLoop < loop - 1) {
-                        currentLoop++;
-                        reader = loopReader.clone();
-                    } else {
-                        break;
-                    }
+        for (i in 0...8192) {
+            var k = 8192 - n;
+            if (k > loopEnd - reader.currentSample) {
+                k = loopEnd - reader.currentSample;
+            }
+            if (k < 1){
+                k = 1;
+            }
+            n += reader.read(output, k, 2, 44100, true);
+            if (n < 8192) {
+                if (currentLoop < loop - 1) {
+                    currentLoop++;
+                    reader = loopReader.clone();
                 } else {
                     break;
                 }
+            } else {
+                break;
             }
         }
+
     }
 
     // EventListener
