@@ -56,7 +56,9 @@ class Ogg2WavFlash extends Sprite
 
                 case Decode(_):
 
-                case FileSave(fileReference, name, info, data, onSaveSelect, onCancel):
+                case WaitClickToSave(_):
+
+                case FileSave(fileReference, name, info, data,onSaveSelect, onCancel):
                     fileReference.removeEventListener(Event.SELECT, onSaveSelect);
                     fileReference.removeEventListener(Event.CANCEL, onCancel);
             }
@@ -80,7 +82,10 @@ class Ogg2WavFlash extends Sprite
             case Decode(reader, info, _):
                 textField.text = "Converting...\n" + info;
 
-            case FileSave(fileReference, name, data, info, onSaveSelect, onCancel):
+            case WaitClickToSave(fileReference, name, info, data,onSaveSelect, onCancel):
+                textField.text = "Click to save .wav file";
+
+            case FileSave(fileReference, name, info, data,onSaveSelect, onCancel):
                 textField.text = "Save";
                 fileReference.addEventListener(Event.SELECT, onSaveSelect);
                 fileReference.addEventListener(Event.CANCEL, onCancel);
@@ -96,6 +101,9 @@ class Ogg2WavFlash extends Sprite
                 var f = new FileReference();
                 updateState(FileBrowse(f, onLoadSelect.bind(f), onCancel));
 
+            case WaitClickToSave(fileReference, name, info, data, onSaveSelect, onCancel):
+                updateState(FileSave(fileReference, name, info, data, onSaveSelect, onCancel));
+
             case _:
         }
     }
@@ -104,11 +112,12 @@ class Ogg2WavFlash extends Sprite
     {
         switch (state) {
             case Decode(reader, output, name, info, onDecode):
-                var n = reader.read(output, reader.header.sampleRate);
+                var n = reader.read(output, 40000);
+                textField.text = 'Converting...${reader.currentSample}/${reader.totalSample} (${Std.int(reader.currentSample / reader.totalSample * 100)}%)\n' + info;
+
                 if (n == 0) {
                     onDecode(reader, output, name, info);
                 }
-                textField.text = 'Converting...${reader.currentSample}/${reader.totalSample} (${Std.int(reader.currentSample / reader.totalSample * 100)}%)\n' + info;
 
             case _:
         }
@@ -166,8 +175,8 @@ class Ogg2WavFlash extends Sprite
     }
 
     static private function onDecode(reader:Reader, output:BytesOutput, name:String, info:String) {
-
-        updateState(FileSave(new FileReference(), name, info, output.getBytes().getData(), onSaveSelect, onCancel));
+        output.flush();
+        updateState(WaitClickToSave(new FileReference(), name, info, output.getBytes().getData(), onSaveSelect, onCancel));
         output.close();
     }
 
@@ -192,5 +201,6 @@ enum State {
     FileBrowse(fileRefernce:FileReference, onSelect:Event->Void, onCancel:Event->Void);
     FileLoad(fileRefernce:FileReference, onComplete:Event->Void);
     Decode(reader:Reader, output:BytesOutput, name:String, info:String, onDecode:Reader->BytesOutput->String->String->Void);
+    WaitClickToSave(fileRefernce:FileReference, name:String, info:String, data:ByteArray, onSelect:Event->Void, onCancel:Event->Void);
     FileSave(fileRefernce:FileReference, name:String, info:String, data:ByteArray, onSelect:Event->Void, onCancel:Event->Void);
 }
