@@ -4,8 +4,8 @@
   "license": "Public",
   "tags": ["flash", "cs", "java", "neko", "ogg", "format"],
   "description": "public domain ogg decoder",
-  "version": "0.0.0",
-  "releasenote": "initial release",
+  "version": "0.0.1",
+  "releasenote": "fix bug on neko target",
   "contributors": ["shohei909"],
   "dependencies": {}
 }
