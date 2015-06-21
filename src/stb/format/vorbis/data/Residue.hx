@@ -82,13 +82,13 @@ class Residue
 
     public function decode(decodeState:VorbisDecodeState, header:Header, residueBuffers:Vector<Vector<Float>>, ch:Int, n:Int,  doNotDecode:Vector<Bool>, channelBuffers:Vector<Vector<Float>>)
     {
-        // STB_VORBIS_DIVIDES_IN_RESIDUE = true
+        // STB_VORBIS_DIVIDES_IN_RESIDUE = false
         var codebooks = header.codebooks;
         var classwords = codebooks[classbook].dimensions;
         var nRead = end - begin;
         var partSize = this.partSize;
         var partRead = Std.int(nRead / partSize);
-        var classifications = new Vector<Int>(header.channel *  partRead);
+        var partClassdata = new Vector<Vector<Int>>(header.channel *  partRead);
 
         VorbisTools.stbProf(2);
         for (i in 0...ch) {
@@ -124,11 +124,7 @@ class Residue
                             if (q == VorbisTools.EOP) {
                                 return;
                             }
-                            var i = classwords;
-                            while (--i >= 0) {
-                                classifications[i + pcount] = q % this.classifications;
-                                q = Std.int(q / this.classifications);
-                            }
+                            partClassdata[classSet] = this.classdata[q];
                         }
                         VorbisTools.stbProf(5);
                         for (i in 0...classwords) {
@@ -136,7 +132,7 @@ class Residue
                                 break;
                             }
                             var z = begin + pcount*partSize;
-                            var c = classifications[pcount];
+                            var c = partClassdata[classSet][i];
                             var b = residueBooks[c][pass];
                             if (b >= 0) {
                                 var book = codebooks[b];
@@ -157,6 +153,7 @@ class Residue
                             ++pcount;
                         }
                         VorbisTools.stbProf(8);
+                        ++classSet;
                     }
                 } else if (ch == 1) {
                     while (pcount < partRead) {
@@ -167,12 +164,7 @@ class Residue
                             var c:Codebook = codebooks[classbook];
                             var q = decodeState.decode(c);
                             if (q == VorbisTools.EOP) return;
-
-                            var i = classwords;
-                            while (--i >= 0) {
-                                classifications[i + pcount] = q % this.classifications;
-                                q = Std.int(q / this.classifications);
-                            }
+                            partClassdata[classSet] = this.classdata[q];
                         }
 
                         for (i in 0...classwords) {
@@ -180,7 +172,8 @@ class Residue
                                 break;
                             }
                             var z = begin + pcount * partSize;
-                            var b = residueBooks[classifications[pcount]][pass];
+                            var c = partClassdata[classSet][i];
+                            var b = residueBooks[c][pass];
                             if (b >= 0) {
                                 var book:Codebook = codebooks[b];
                                 VorbisTools.stbProf(22);
@@ -199,6 +192,7 @@ class Residue
                             }
                             ++pcount;
                         }
+                        ++classSet;
                     }
                 } else {
                     while (pcount < partRead) {
@@ -212,12 +206,7 @@ class Residue
                             if (q == VorbisTools.EOP) {
                                 return;
                             }
-
-                            var i = classwords;
-                            while (--i >= 0) {
-                                classifications[i+pcount] = q % this.classifications;
-                                q = Std.int(q / this.classifications);
-                            }
+                            partClassdata[classSet] = this.classdata[q];
                         }
 
                         for (i in 0...classwords) {
@@ -225,7 +214,8 @@ class Residue
                                 break;
                             }
                             var z = begin + pcount * partSize;
-                            var b = residueBooks[classifications[pcount]][pass];
+                            var c = partClassdata[classSet][i];
+                            var b = residueBooks[c][pass];
                             if (b >= 0) {
                                 var book = codebooks[b];
                                 VorbisTools.stbProf(22);
@@ -244,6 +234,7 @@ class Residue
                             }
                             ++pcount;
                         }
+                        ++classSet;
                     }
                 }
             }
@@ -263,11 +254,7 @@ class Residue
                             if (temp == VorbisTools.EOP) {
                                 return;
                             }
-                            var i = classwords;
-                            while (--i >= 0) {
-                                classifications[j * partRead + i + pcount] = temp % this.classifications;
-                                temp = Std.int(temp / this.classifications);
-                            }
+                            partClassdata[j * partRead + classSet] = this.classdata[temp];
                         }
                     }
                 }
@@ -277,7 +264,7 @@ class Residue
                     }
                     for (j in 0...ch) {
                         if (!doNotDecode[j]) {
-                            var c = classifications[j  * partRead + pcount];
+                            var c = partClassdata[j  * partRead + classSet][i];
                             var b = residueBooks[c][pass];
                             if (b >= 0) {
                                 var target = residueBuffers[j];
@@ -292,6 +279,7 @@ class Residue
                     }
                     ++pcount;
                 }
+                ++classSet;
             }
         }
     }
