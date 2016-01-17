@@ -15,11 +15,13 @@ class Crc32
             return;
         }
         
+		var uSign : UInt = cast ( 1 << 31 );
+		
         table = new Vector(256);
         for (i in 0...256) {
             var s:UInt = ((i:UInt) << (24:UInt));
             for (j in 0...8) {
-                s = (s << 1) ^ (s >= ((1:UInt) << 31) ? POLY : 0);
+                s = (s << 1) ^ (s >= uSign ? POLY : 0);
             }
             table[i] = s;
         }
