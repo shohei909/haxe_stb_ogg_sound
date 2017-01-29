@@ -1,2 +1,0 @@
-hxcpp_api_level=331
-hxcpp=F:\_haxelib\hxcpp/3,4,2/
