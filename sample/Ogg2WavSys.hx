@@ -85,6 +85,8 @@ class Ogg2WavSys
     "java"
     #elseif neko
     "neko"
+    #elseif cpp
+    "cpp"
     #else
     "other"
     #end

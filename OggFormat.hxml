@@ -1,0 +1,7 @@
+-cp src
+-cp sample
+-cp lib
+-swf bin/main.swf
+-swf-header 800:600:30:FFFFFF
+-swf-version 17.0
+-main VorbisSoundPlayer

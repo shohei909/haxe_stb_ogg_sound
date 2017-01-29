@@ -1,0 +1,11 @@
+hxml/ogg2WavSys.hxml
+-cpp sample/bin-cpp
+
+--next
+
+# windows: 
+-cmd "sample\bin-cpp\Ogg2WavSys.exe"
+
+# linux:
+#-cmd sample/bin-cpp/Ogg2WavSys	
+	
