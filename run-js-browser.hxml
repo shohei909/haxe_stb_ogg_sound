@@ -1,0 +1,18 @@
+
+-cp src
+-cp sample
+-main Ogg2WavBrowser
+-js sample/bin-browser/client.js
+-dce full
+
+--next
+
+-cp src
+-cp sample
+-js sample/bin-browser/worker.js
+WorkerScript
+
+
+
+
+
