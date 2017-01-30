@@ -92,10 +92,11 @@ class WorkerScript
 	
 	inline public function stringToArrayBuffer(msg:String):ArrayBuffer  return Bytes.ofString(msg.substr(0, 99)).getData();
 
-	// The following line seems to be needed only by the compiler...
+	@:pure(false) 
 	public function postMessage(message, ?messageArray)
 	{
-		trace(''); // DON'T REMOVE! - The compiler is a bit to aggressive...
+		// At runtime, this postMessage method is overridden by an implicit JavaScript enginge method
+		// but Haxe needs an explicit method at compile time
 	}
 
 	static private function lapTime(time:Float)

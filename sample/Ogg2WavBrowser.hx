@@ -81,9 +81,8 @@ class Ogg2WavBrowser
 	// display message on web page
 	static function bodyTrace(s:Dynamic)
 	{
-		var body:js.html.Element =document.getElementById('body');
-		body.appendChild(document.createTextNode(Std.string(s)));
-		body.appendChild(document.createBRElement());
+		document.body.appendChild(document.createTextNode(Std.string(s)));
+		document.body.appendChild(document.createBRElement());
 	};
 }
 
