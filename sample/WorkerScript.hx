@@ -12,14 +12,19 @@ class WorkerScript
 		untyped __js__("onmessage = WorkerScript.prototype.messageHandler");
 	}
 
+	// handle messages sent from client
 	public function messageHandler(event)
 	{
-		//trace('worker message recieved:  ' + event);
+		// handle event data as arrayBuffer
 		var arrayBuffer:js.html.ArrayBuffer = cast event.data;
+		
+		// convert to haxe.io.Bytes
 		var bytes:Bytes = Bytes.ofData(arrayBuffer);
 		
+		// kick of the Vorbis Reader 
 		var reader = Reader.openFromBytes(bytes);
 
+		// get some metadata
 		var header = reader.header;
 		var bitsPerSample = 16;
 		var byteRate = Std.int(header.channel * header.sampleRate * bitsPerSample / 8);
@@ -41,6 +46,9 @@ class WorkerScript
 			}
 		}
 
+		//------------------------------------------------------------------------------
+		
+		// create an instance of haxe.io.Output to be populated with WAV data by the Vorbis Reader
 		var output = new BytesOutput();
 		output.bigEndian = false;
 		output.writeString("RIFF");
@@ -60,17 +68,25 @@ class WorkerScript
 		while (true)
 		{
 			var time = Date.now().getTime();
+			
+			// decode OGG chunks and write WAV data to output
 			var n = reader.read(output, 500000);
 			postMessage(stringToArrayBuffer('${reader.currentSample}/${reader.totalSample} : Decode Time ${lapTime(time)}'));
 			if (n == 0) break;
 		}
 
+		// close the output
 		output.flush();
 		output.close();
 
 		postMessage(stringToArrayBuffer('Ogg decoding completed!'));
+		
+		// get the output data as ArrayBuffer 
 		var outputArrayBuffer:js.html.ArrayBuffer = output.getBytes().getData();
 		
+		// post the WAV data to the client
+		// trying to use arrayBuffer as transferable object for best performance
+		// http://stackoverflow.com/questions/19152772/how-to-pass-large-data-to-web-workers		
 		postMessage(outputArrayBuffer, [outputArrayBuffer]);
 	}
 	
@@ -79,7 +95,7 @@ class WorkerScript
 	// The following line seems to be needed only by the compiler...
 	public function postMessage(message, ?messageArray)
 	{
-		trace(''); //
+		trace(''); // DON'T REMOVE! - The compiler is a bit to aggressive...
 	}
 
 	static private function lapTime(time:Float)
