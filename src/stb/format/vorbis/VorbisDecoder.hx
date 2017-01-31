@@ -79,7 +79,7 @@ class VorbisDecoder
         return decoder;
     }
 
-    public function read(output:Output, samples:Int, channels:Int, sampleRate:Int, useFloat:Bool) {
+    @:noDebug public function read(output:Output, samples:Int, channels:Int, sampleRate:Int, useFloat:Bool) {
         if (sampleRate % header.sampleRate != 0) {
             throw 'Unsupported sampleRate : can\'t convert ${header.sampleRate} to $sampleRate';
         }

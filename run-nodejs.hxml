@@ -1,0 +1,12 @@
+-cp ../../cx/src
+-cp sample
+-cp src
+-main Ogg2WavNodejs
+
+
+-js sample/bin-nodejs/ogg2wav.js
+-lib hxnodejs
+
+--next
+-cmd node sample/bin-nodejs/ogg2wav.js
+
