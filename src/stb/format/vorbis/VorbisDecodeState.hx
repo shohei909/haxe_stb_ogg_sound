@@ -832,7 +832,7 @@ class VorbisDecodeState
             if (cl == Codebook.NO_CODE) {
                 continue;
             }
-            if (codewords[i] == (acc & ((1 << cl)-1))) {
+            if (codewords[i] == (acc & ((1 << cl)-1):UInt )) {
                 if (validBits >= cl) {
                     acc >>>= cl;
                     validBits -= cl;
