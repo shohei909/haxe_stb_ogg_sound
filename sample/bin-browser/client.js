@@ -7,48 +7,84 @@ function $extend(from, fields) {
 	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
 }
+var HxOverrides = function() { };
+HxOverrides.__name__ = true;
+HxOverrides.substr = function(s,pos,len) {
+	if(len == null) {
+		len = s.length;
+	} else if(len < 0) {
+		if(pos == 0) {
+			len = s.length + len;
+		} else {
+			return "";
+		}
+	}
+	return s.substr(pos,len);
+};
 Math.__name__ = true;
 var Ogg2WavBrowser = function() { };
 Ogg2WavBrowser.__name__ = true;
 Ogg2WavBrowser.main = function() {
-	Ogg2WavBrowser.worker = new Worker("worker.js");
-	Ogg2WavBrowser.worker.onmessage = Ogg2WavBrowser.onWorkerMessage;
-	window.document.getElementById("files").addEventListener("change",Ogg2WavBrowser.handleFileSelect,false);
-	Ogg2WavBrowser.bodyTrace("Select one or many .ogg files to start background worker decoding");
-};
-Ogg2WavBrowser.onWorkerMessage = function(event) {
-	var arrayBuffer = event.data;
-	var dataView = new DataView(arrayBuffer);
-	if(dataView.byteLength < 100) {
-		Ogg2WavBrowser.bodyTrace("- Message from worker: " + haxe_io_Bytes.ofData(arrayBuffer).toString());
-	} else {
-		Ogg2WavBrowser.bodyTrace("Client recieved WAV data chunk of length " + dataView.byteLength + " from worker");
-	}
+	haxe_Log.trace = function(v,infos) {
+		window.document.body.appendChild(window.document.createTextNode(Std.string(v)));
+		window.document.body.appendChild(window.document.createElement("br"));
+	};
+	haxe_Log.trace("Select one or many .ogg files to start background worker decoding",{ fileName : "Ogg2WavBrowser.hx", lineNumber : 22, className : "Ogg2WavBrowser", methodName : "main"});
+	var fileInput = window.document.createElement("input");
+	fileInput.id = "files";
+	fileInput.type = "file";
+	fileInput.multiple = true;
+	fileInput.addEventListener("change",Ogg2WavBrowser.handleFileSelect,false);
+	window.document.body.appendChild(fileInput);
 };
 Ogg2WavBrowser.handleFileSelect = function(event) {
 	var files = event.target.files;
 	var _g = 0;
 	while(_g < files.length) {
-		var f = files[_g];
+		var file = [files[_g]];
 		++_g;
-		Ogg2WavBrowser.bodyTrace("Open file " + f.name + " " + f.type + " for deoding");
+		if(haxe_io_Path.extension(file[0].name).toLowerCase() != "ogg") {
+			continue;
+		}
+		haxe_Log.trace("Open file " + file[0].name + " " + file[0].type + " for decoding",{ fileName : "Ogg2WavBrowser.hx", lineNumber : 40, className : "Ogg2WavBrowser", methodName : "handleFileSelect"});
 		var reader = [new FileReader()];
-		reader[0].onload = (function(reader1) {
+		reader[0].onload = (function(reader1,file1) {
 			return function(evt) {
 				var arrayBuffer = reader1[0].result;
 				if(arrayBuffer.byteLength % 2 == 1) {
 					arrayBuffer = arrayBuffer.slice(0,arrayBuffer.byteLength - 1);
 				}
-				Ogg2WavBrowser.bodyTrace("Client start sending arrayBuffer to worker...");
-				Ogg2WavBrowser.worker.postMessage(arrayBuffer,[arrayBuffer]);
+				haxe_Log.trace("Client start sending arrayBuffer to worker...",{ fileName : "Ogg2WavBrowser.hx", lineNumber : 54, className : "Ogg2WavBrowser", methodName : "handleFileSelect"});
+				var worker = new Worker("worker.js");
+				worker.onmessage = (function(file2) {
+					return function(event1) {
+						var arrayBuffer1 = event1.data;
+						var dataView = new DataView(arrayBuffer1);
+						if(dataView.byteLength < 100) {
+							haxe_Log.trace("- Message from worker: (" + file2[0].name + ") " + haxe_io_Bytes.ofData(arrayBuffer1).toString(),{ fileName : "Ogg2WavBrowser.hx", lineNumber : 70, className : "Ogg2WavBrowser", methodName : "handleFileSelect"});
+						} else {
+							haxe_Log.trace("Client recieved WAV data chunk of length " + dataView.byteLength + " from worker",{ fileName : "Ogg2WavBrowser.hx", lineNumber : 75, className : "Ogg2WavBrowser", methodName : "handleFileSelect"});
+							var wavFilename = HxOverrides.substr(file2[0].name,0,file2[0].name.lastIndexOf(".")) + ".wav";
+							var wavBytes = new Int8Array(arrayBuffer1);
+							Ogg2WavBrowser.saveFile(wavBytes,wavFilename);
+						}
+					};
+				})(file1);
+				worker.postMessage(arrayBuffer,[arrayBuffer]);
 			};
-		})(reader);
-		reader[0].readAsArrayBuffer(f);
+		})(reader,file);
+		reader[0].readAsArrayBuffer(file[0]);
 	}
 };
-Ogg2WavBrowser.bodyTrace = function(s) {
-	window.document.body.appendChild(window.document.createTextNode(Std.string(s)));
-	window.document.body.appendChild(window.document.createElement("br"));
+Ogg2WavBrowser.saveFile = function(data,name) {
+	var blob = new Blob([data],{ type : "octet/stream"});
+	var url = URL.createObjectURL(blob);
+	var a = window.document.createElement("a");
+	window.document.body.appendChild(a);
+	a.href = url;
+	a.download = name;
+	a.click();
+	URL.revokeObjectURL(url);
 };
 var Std = function() { };
 Std.__name__ = true;
@@ -62,6 +98,11 @@ var haxe__$Int64__$_$_$Int64 = function(high,low) {
 haxe__$Int64__$_$_$Int64.__name__ = true;
 haxe__$Int64__$_$_$Int64.prototype = {
 	__class__: haxe__$Int64__$_$_$Int64
+};
+var haxe_Log = function() { };
+haxe_Log.__name__ = true;
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
 };
 var haxe_io_Bytes = function(data) {
 	this.length = data.byteLength;
@@ -188,6 +229,45 @@ haxe_io_FPHelper.doubleToI64 = function(v) {
 	}
 	return i64;
 };
+var haxe_io_Path = function(path) {
+	switch(path) {
+	case ".":case "..":
+		this.dir = path;
+		this.file = "";
+		return;
+	}
+	var c1 = path.lastIndexOf("/");
+	var c2 = path.lastIndexOf("\\");
+	if(c1 < c2) {
+		this.dir = HxOverrides.substr(path,0,c2);
+		path = HxOverrides.substr(path,c2 + 1,null);
+		this.backslash = true;
+	} else if(c2 < c1) {
+		this.dir = HxOverrides.substr(path,0,c1);
+		path = HxOverrides.substr(path,c1 + 1,null);
+	} else {
+		this.dir = null;
+	}
+	var cp = path.lastIndexOf(".");
+	if(cp != -1) {
+		this.ext = HxOverrides.substr(path,cp + 1,null);
+		this.file = HxOverrides.substr(path,0,cp);
+	} else {
+		this.ext = null;
+		this.file = path;
+	}
+};
+haxe_io_Path.__name__ = true;
+haxe_io_Path.extension = function(path) {
+	var s = new haxe_io_Path(path);
+	if(s.ext == null) {
+		return "";
+	}
+	return s.ext;
+};
+haxe_io_Path.prototype = {
+	__class__: haxe_io_Path
+};
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
 	this.val = val;
@@ -210,6 +290,35 @@ js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
 });
 var js_Boot = function() { };
 js_Boot.__name__ = true;
+js_Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js_Boot.__trace = function(v,i) {
+	var msg = i != null ? i.fileName + ":" + i.lineNumber + ": " : "";
+	msg += js_Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js_Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	var tmp;
+	if(typeof(document) != "undefined") {
+		d = document.getElementById("haxe:trace");
+		tmp = d != null;
+	} else {
+		tmp = false;
+	}
+	if(tmp) {
+		d.innerHTML += js_Boot.__unhtml(msg) + "<br/>";
+	} else if(typeof console != "undefined" && console.log != null) {
+		console.log(msg);
+	}
+};
 js_Boot.getClass = function(o) {
 	if((o instanceof Array) && o.__enum__ == null) {
 		return Array;
